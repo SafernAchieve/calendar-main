@@ -1,5 +1,6 @@
 .wrap {
     display: flex;
+    font-family: Arial, sans-serif; /* Consistent font setting */
 }
 
 .left {
@@ -15,14 +16,15 @@
 .toolbar {
     background-color: #F9F9F9;
     border-radius: 8px;
-    padding: 10px 20px;
-    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 15px 25px;
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
     display: flex;
     align-items: center;
     justify-content: start;
     flex-wrap: wrap;
     margin-bottom: 20px;
     border: 1px solid #E0E0E0;
+    font-size: 14px; /* Consistent font size */
 }
 
 .toolbar a,
@@ -31,18 +33,18 @@
     color: #333;
     text-decoration: none;
     margin: 0 5px;
-    padding: 5px 15px;
-    border-radius: 15px;
+    padding: 7px 20px;
+    border-radius: 20px;
     transition: all 0.3s;
-    width: 100px;
-    border: none; /* remove default button borders */
-    cursor: pointer; /* hand cursor for buttons */
-    outline: none; /* remove focus outline */
+    width: 110px;
+    border: none; /* Remove default button borders */
+    cursor: pointer; /* Hand cursor for buttons */
+    outline: none; /* Remove focus outline */
+    font-size: 14px; /* Consistent font size */
 }
 
 .toolbar a:hover,
-.toolbar button:hover
-{
+.toolbar button:hover {
     background-color: #3c78d8;
     color: #FFF;
 }
@@ -54,20 +56,21 @@
 /* button, slightly different */
 
 .toolbar button {
-    background-color: #777777;  /* primary color */
-    color: #FFF;  /* white text */
-    padding: 7px 17px;
+    background-color: #777777;  /* Primary color */
+    color: #FFF;  /* White text */
+    padding: 9px 22px;
 }
 
 .toolbar select {
     border: 1px solid #E0E0E0;
     background-color: #FFF;
-    padding: 5px 15px;
-    border-radius: 15px;
+    padding: 7px 20px;
+    border-radius: 20px;
     margin: 0 10px;
     outline: none;
     cursor: pointer;
     transition: border-color 0.3s;
+    font-size: 14px; /* Consistent font size */
 }
 
 .toolbar select:focus {
@@ -78,40 +81,39 @@
     padding: 5px 10px;
 }
 
-
 /* toolbar label */
 
 .toolbar label {
     margin: 0 10px;
     display: flex;
-    align-items: center;  /* central vertical alignment for items inside the label */
+    align-items: center;  /* Central vertical alignment for items inside the label */
     cursor: pointer;
 }
 
-.toolbar input[type="radio"] {
-    margin-right: 5px;  /* give space on the right side of the radio button */
-    margin-bottom: 4px;
+.toolbar label > *:not(:last-child) {
+    margin-right: 10px; /* Add space between label and child elements */
 }
 
+.toolbar input[type="radio"],
 .toolbar input[type="checkbox"] {
-    margin-right: 5px;
+    margin-right: 8px; /* Consistent spacing */
 }
 
 /* text input */
 
 .toolbar input[type="text"] {
     border: 1px solid #E0E0E0;
-    padding: 5px 10px;
-    border-radius: 15px;
+    padding: 7px 15px;
+    border-radius: 20px;
     outline: none;
     transition: border-color 0.3s;
-    margin: 0 10px; /* spacing between the input and subsequent elements */
+    margin: 0 10px; /* Spacing between the input and subsequent elements */
+    font-size: 14px; /* Consistent font size */
 }
 
 .toolbar input[type="text"]:focus {
     border-color: #3c78d8;
 }
-
 
 /* icon */
 
@@ -123,8 +125,27 @@
     color: #ffffff;
     background-color: #777777;
     transition: all 0.3s;
+    margin: 0 10px; /* Add margin for spacing */
+    padding: 10px; /* Add padding for size */
 }
 
 .icon:hover {
     background-color: #3c78d8;
+}
+
+/* Add global styles for better appearance */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f4f4;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #FFF;
+    border-radius: 8px;
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
 }

@@ -135,7 +135,7 @@ const generateRecurringEvents = (booking, startDate, endDate) => {
     return events;
 };
 
-export const getBookings = async (start, end) => {
+export const getBookings = async (start, end ) => {
   const startDate = new DayPilot.Date(start);
   const endDate = new DayPilot.Date(end);
   try {
