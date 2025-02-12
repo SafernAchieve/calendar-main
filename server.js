@@ -95,7 +95,7 @@ app.get('/events', async (req, res) => {
 
 });
 
-const PORT = process.env.PORT || 4000; // Use the Azure-assigned port  or  fallback to 4000
+const PORT = process.env.PORT || 4000; // Use the Azure-assigned port    or  fallback to 4000
 const HOST = '0.0.0.0'; // Bind to all available interfaces
 
 server.listen(PORT, HOST, () => {
