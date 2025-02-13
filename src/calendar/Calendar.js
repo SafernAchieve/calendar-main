@@ -56,7 +56,23 @@ const Calendar = () => {
     eventMoveHandling: "false",
     eventResizeHandling: "false",
     eventClickHandling: "Disabled",
-    eventHoverHandling: "Enabled",
+    eventHoverHandling: "Bubble", // Enables event hover
+  
+    bubble: new DayPilot.Bubble({
+      onLoad: (args) => {
+        args.html = `
+          <div>
+            <strong>${args.source.data.text}</strong><br>
+            Start: ${new DayPilot.Date(args.source.data.start).toString("MM/dd/yyyy HH:mm")}<br>
+            End: ${new DayPilot.Date(args.source.data.end).toString("MM/dd/yyyy HH:mm")}
+          </div>
+        `;
+      },
+    }),
+
+
+
+
   });
 
   const calendarRef = useRef(null);

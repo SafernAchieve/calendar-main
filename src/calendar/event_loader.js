@@ -7,7 +7,7 @@ import { RRule } from 'rrule';
 // Dynamically determine the base URL
 const BASE_URL = window.location.origin.includes('localhost') 
     ? "http://localhost:4000" // Local development
-    : "https://viewscheduleapp.azurewebsites.net"; // Azure production
+    : "https://roomserver.azurewebsites.net"; // Azure production
 
 const EVENTS_URL = `${BASE_URL}/events`;
 const BOOKINGS_URL = `${BASE_URL}/bookings`;
