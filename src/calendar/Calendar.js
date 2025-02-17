@@ -39,6 +39,66 @@ const Calendar = () => {
 
   console.log("bookingsData", bookingsData);
   console.log("webs", webs);
+  const getDateParts = (dtstring) => {
+    const year = dtstring.slice(0, 4);
+    const month = dtstring.slice(4, 6);
+    const day = dtstring.slice(6, 8);
+    const hours = dtstring.slice(9, 11);
+    const minutes = dtstring.slice(11, 13);
+  
+    const monthNumber = Number(month);
+    const monthIndex = monthNumber - 1;
+  
+    return {
+      year, monthIndex, day, hours, minutes
+    };
+  };
+  
+  const getDateFromParts = (parts) => {
+    return new Date(
+      parts.year,
+      parts.monthIndex,
+      parts.day,
+      parts.hours,
+      parts.minutes
+    );
+  };
+  
+  const formatUntilDate = (until) => {
+    const parts = getDateParts(until);
+    const date = getDateFromParts(parts);
+    return date.toLocaleString('en-US', { hour12: true, timeZone: 'UTC' });
+  };
+  
+  // Helper function to format the recurrence rule
+  const formatRecurrenceRule = (recurrenceRule) => {
+    const lines = recurrenceRule.split("\n");
+    const dtstart = lines.find(line => line.startsWith("DTSTART")).split(":")[1];
+    const dtend = lines.find(line => line.startsWith("DTEND")).split(":")[1];
+    const rrule = lines.find(line => line.startsWith("RRULE"));
+  
+    const startParts = getDateParts(dtstart);
+
+    const startDate = getDateFromParts(startParts);
+  
+  
+    const ruleParts = rrule.split(";").reduce((acc, part) => {
+      const [key, value] = part.split("=");
+      acc[key] = value;
+      return acc;
+    }, {});
+  
+    const frequency = ruleParts.FREQ || "WEEKLY";
+    const until = ruleParts.UNTIL ? formatUntilDate(ruleParts.UNTIL) : "N/A";
+  
+    return `
+      Start: ${startDate.toLocaleString('en-US', { hour12: true, timeZone: 'UTC' })}<br>
+   
+      Frequency: ${frequency}<br>
+      Until: ${until}<br>
+    `;
+  };
+
 
   const [config, setConfig] = useState({
     locale: "en-us",
@@ -60,18 +120,20 @@ const Calendar = () => {
   
     bubble: new DayPilot.Bubble({
       onLoad: (args) => {
+        let recurrenceRuleHtml = "";
+        if (args.source.data.recurrenceRule) {
+          recurrenceRuleHtml = `<br>Recurrence:<br>${formatRecurrenceRule(args.source.data.recurrenceRule)}`;
+        }
         args.html = `
-          <div>
-            <strong>${args.source.data.text}</strong><br>
-            Start: ${new DayPilot.Date(args.source.data.start).toString("MM/dd/yyyy HH:mm")}<br>
-            End: ${new DayPilot.Date(args.source.data.end).toString("MM/dd/yyyy HH:mm")}
-          </div>
+   <div>
+  <strong>${args.source.data.text}</strong><br>
+  Start: ${new DayPilot.Date(args.source.data.start).toString("MM/dd/yyyy hh:mm tt")}<br>
+  End: ${new DayPilot.Date(args.source.data.end).toString("MM/dd/yyyy hh:mm tt")}
+  ${recurrenceRuleHtml}
+</div>
         `;
       },
     }),
-
-
-
 
   });
 
@@ -182,6 +244,7 @@ const Calendar = () => {
         text: booking.title || "Untitled Event", // Use a default title if none is provided
         id: booking.id,
         resource: booking.resources, // Assuming the first space ID is the resource
+        recurrenceRule: booking.recurrenceRule || "", // Ensure that recurrenceRule is set
       }));
   
       const mergedEvents = events.reduce((acc, current) => {
@@ -253,6 +316,7 @@ const Calendar = () => {
       text: event.summary,
       id: event.uid,
       resource: event.resources,
+      recurrenceRule: event.recurrenceRule || "", // Ensure that recurrenceRule is set
     }));
     setEvents(e);
     setSelectedEvents(e);
@@ -423,7 +487,6 @@ const Calendar = () => {
       cellHeight: 30 * zoomLevel,
     }));
   }, [zoomLevel]);
-
   return (
     <div className="wrap">
       <div className="calendar">
@@ -456,7 +519,7 @@ const Calendar = () => {
             Room Type:
             <select onChange={handlePurposeChange} value={selectedPurpose}>
               <option value="All">All</option>
-              <option value="Play">Play</option>
+              <option value="Playroom">Playroom</option>
               <option value="Couple">Couple</option>
               <option value="Individual">Individual</option>
               <option value="Conference Room">Conference Room</option>

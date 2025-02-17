@@ -3,14 +3,14 @@ const resources = [
     "name": "2 MPD Conference Room",
     "id": "2 MPD Conference Room",
     "location": "2 MPD",
-    "purpose": "", 
+    "purpose": "Conference Room", 
     "eventBackColor": "#fff"
   },
   {
     "name": "CC-00 (Small Conference Room)",
     "id": "CC-00 (Small Conference Room)",
     "location": "CC",
-    "purpose": "", 
+    "purpose": "Conference Room", 
     "eventBackColor": "#fff",
     "ClinicalSpace": "CC"
   },
@@ -40,7 +40,7 @@ const resources = [
     "name": "21 RPD Conference Room",
     "id": "21 RPD Conference Room",
     "location": "RPD",
-    "purpose": ""
+    "purpose": "Conference Room"
   },
   {
     "name": "950-10",
@@ -88,19 +88,71 @@ const resources = [
     "location": "",
     "purpose": ""
   },
-  {
-    "name": "Airmont -  03",
-    "id": "Airmont -  03",
-    "location": "Airmont",
-    "purpose": "",
-    "ClinicalSpace": "Airmont"
-  },
+
+
+ 
   {
     "name": "Airmont - 01",
     "id": "Airmont - 01",
     "location": "Airmont",
     "purpose": "",
      "ClinicalSpace": "Airmont"
+  },
+  {
+    "name": "Airmont - 02",
+    "id": "Airmont - 02",
+    "location": "Airmont",
+    "purpose": "Couple",
+      "ClinicalSpace": "Airmont"
+  },
+  {
+    "name": "Airmont - 03",
+    "id": "Airmont - 03",
+    "location": "Airmont",
+    "purpose": "Couple",
+    "ClinicalSpace": "Airmont"
+  },
+  {
+    "name": "Airmont - 04",
+    "id": "Airmont - 04",
+    "location": "Airmont",
+    "purpose": "Couple",
+    "ClinicalSpace": "Airmont"
+  },
+  {
+    "name": "Airmont - 05 Playroom",
+    "id": "Airmont - 05 Playroom",
+    "location": "Airmont",
+    "purpose": "Playroom",
+    "ClinicalSpace": "Airmont"
+  },
+  {
+    "name": "Airmont - 06",
+    "id": "Airmont - 06",
+    "location": "Airmont",
+    "purpose": "",
+    "ClinicalSpace": "Airmont"
+  },
+  {
+    "name": "Airmont - 07 Playroom",
+    "id": "Airmont - 07 Playroom",
+    "location": "Airmont",
+    "purpose": "Playroom",
+    "ClinicalSpace": "Airmont"
+  },
+  {
+    "name": "Airmont - 08",
+    "id": "Airmont - 08",
+    "location": "Airmont",
+    "purpose": "",
+    "ClinicalSpace": "Airmont"
+  },
+  {
+    "name": "Airmont - 09  Playroom",
+    "id": "Airmont - 09  Playroom",
+    "location": "Airmont",
+    "purpose": "Playroom",
+    "ClinicalSpace": "Airmont"
   },
   {
     "name": "Airmont - 11",
@@ -113,21 +165,21 @@ const resources = [
     "name": "Airmont - 12",
     "id": "Airmont - 12",
     "location": "Airmont",
-    "purpose": "",
+    "purpose": "Couple",
     "ClinicalSpace": "Airmont"
   },
   {
     "name": "Airmont - 13",
     "id": "Airmont - 13",
     "location": "Airmont",
-    "purpose": "",
+    "purpose": "Couple",
     "ClinicalSpace": "Airmont"
   },
   {
     "name": "Airmont - 14",
     "id": "Airmont - 14",
     "location": "Airmont",
-    "purpose": "",
+    "purpose": "Couple",
       "ClinicalSpace": "Airmont"
   },
   {
@@ -159,66 +211,10 @@ const resources = [
     "ClinicalSpace": "Airmont"
   },
   {
-    "name": "Airmont - 02",
-    "id": "Airmont - 02",
-    "location": "Airmont",
-    "purpose": "",
-      "ClinicalSpace": "Airmont"
-  },
-  {
-    "name": "Airmont - 03",
-    "id": "Airmont - 02",
-    "location": "Airmont",
-    "purpose": "",
-    "ClinicalSpace": "Airmont"
-  },
-  {
-    "name": "Airmont - 04",
-    "id": "Airmont - 04",
-    "location": "Airmont",
-    "purpose": "",
-    "ClinicalSpace": "Airmont"
-  },
-  {
-    "name": "Airmont - 05 Playroom",
-    "id": "Airmont - 05 Playroom",
-    "location": "Airmont",
-    "purpose": "",
-    "ClinicalSpace": "Airmont"
-  },
-  {
-    "name": "Airmont - 06",
-    "id": "Airmont - 06",
-    "location": "Airmont",
-    "purpose": "",
-    "ClinicalSpace": "Airmont"
-  },
-  {
-    "name": "Airmont - 07 Playroom",
-    "id": "Airmont - 07 Playroom",
-    "location": "Airmont",
-    "purpose": "",
-    "ClinicalSpace": "Airmont"
-  },
-  {
-    "name": "Airmont - 08",
-    "id": "Airmont - 08",
-    "location": "Airmont",
-    "purpose": "",
-    "ClinicalSpace": "Airmont"
-  },
-  {
-    "name": "Airmont - 09  Playroom",
-    "id": "Airmont - 09  Playroom",
-    "location": "Airmont",
-    "purpose": "",
-    "ClinicalSpace": "Airmont"
-  },
-  {
     "name": "CC-0 (Small Conference Room)",
     "id": "CC-0 (Small Conference Room)",
     "location": "CC",
-    "purpose": "Play",
+    "purpose": "Conference Room",
     "eventBackColor": "#0ff",
     "ClinicalSpace": "CC"
   },
@@ -274,14 +270,14 @@ const resources = [
     "name": "CC-15 - Green",
     "id": "CC-15 - Green",
     "location": "CC",
-    "purpose": "",
+    "purpose": "Couple",
       "ClinicalSpace": "CC"
   },
   {
     "name": "CC-16 - Blue",
     "id": "CC-16 - Blue",
     "location": "CC",
-    "purpose": "",
+    "purpose": "Couple",
       "ClinicalSpace": "CC"
   },
   {
@@ -302,7 +298,7 @@ const resources = [
     "name": "CC-21 - Conference Room",
     "id": "CC-21 - Conference Room",
     "location": "CC",
-    "purpose": "",
+    "purpose": "Conference Room",
       "ClinicalSpace": "CC"
   },
   {
@@ -323,7 +319,7 @@ const resources = [
     "name": "CC-24",
     "id": "CC-24",
     "location": "CC",
-    "purpose": "",
+    "purpose": "Couple",
       "ClinicalSpace": "CC"
   },
   {
@@ -344,7 +340,7 @@ const resources = [
     "name": "CC-27",
     "id": "CC-27",
     "location": "CC",
-    "purpose": "",
+    "purpose": "Couple",
       "ClinicalSpace": "CC"
   },
   {
@@ -365,7 +361,7 @@ const resources = [
     "name": "CC-30 - Playroom",
     "id": "CC-30 - Playroom",
     "location": "CC",
-    "purpose": "",
+    "purpose": "Playroom",
     "ClinicalSpace": "CC"
   },
   {
@@ -393,7 +389,7 @@ const resources = [
     "name": "CC-34 - Playroom",
     "id": "CC-34 - Playroom",
     "location": "CC",
-    "purpose": "",
+    "purpose": "Playroom",
     "ClinicalSpace": "CC"
   },
   {
@@ -442,7 +438,7 @@ const resources = [
     "name": "M 3601 - Playroom",
     "id": "M 3601 - Playroom",
     "location": "M",
-    "purpose": "",
+    "purpose": "Playroom",
       "ClinicalSpace": "M"
 
   },
@@ -499,7 +495,7 @@ const resources = [
     "name": "M 3609 - Playroom",
     "id": "M 3609 - Playroom",
     "location": "M",
-    "purpose": "",
+    "purpose": "Playroom",
       "ClinicalSpace": "M"
   },
   {
@@ -513,7 +509,7 @@ const resources = [
     "name": "M 3611 - Playroom",
     "id": "M 3611 - Playroom",
     "location": "M",
-    "purpose": "",
+    "purpose": "Playroom",
       "ClinicalSpace": "M"
   },
   {
@@ -541,7 +537,7 @@ const resources = [
     "name": "M 3616 - Conf",
     "id": "M 3616 - Conf",
     "location": "M",
-    "purpose": "",
+    "purpose": "Conference Room",
       "ClinicalSpace": "M"
   },
   {
@@ -625,7 +621,7 @@ const resources = [
     "name": "RP -17 - Playroom",
     "id": "RP -17 - Playroom",
     "location": "RP",
-    "purpose": "",
+    "purpose": "Playroom",
       "ClinicalSpace": "RP"
   },
   {
@@ -639,21 +635,21 @@ const resources = [
     "name": "RP -19 - Playroom",
     "id": "RP -19 - Playroom",
     "location": "RP",
-    "purpose": "",
+    "purpose": "Playroom",
       "ClinicalSpace": "RP"
   },
   {
     "name": "RP -02 - Conference Room",
     "id": "RP -02 - Conference Room",
     "location": "RP",
-    "purpose": "",
+    "purpose": "Conference Room",
       "ClinicalSpace": "RP"
   },
   {
     "name": "RP -20 - Playroom",
     "id": "RP -20 - Playroom",
     "location": "RP",
-    "purpose": "",
+    "purpose": "Playroom",
       "ClinicalSpace": "RP"
   },
   {
@@ -709,7 +705,7 @@ const resources = [
     "name": "RP -29 - Sm Conf Rm",
     "id": "RP -29 - Sm Conf Rm",
     "location": "RP",
-    "purpose": "",
+    "purpose": "Conference Room",
       "ClinicalSpace": "RP"
   },
   {
@@ -723,7 +719,7 @@ const resources = [
     "name": "RP -05",
     "id": "RP -05",
     "location": "RP",
-    "purpose": "",
+    "purpose": "Couple",
       "ClinicalSpace": "RP"
   },
   {
@@ -737,7 +733,7 @@ const resources = [
     "name": "RP -07",
     "id": "RP -07",
     "location": "RP",
-    "purpose": "",
+    "purpose": "Couple",
       "ClinicalSpace": "RP"
   },
   {
@@ -751,7 +747,7 @@ const resources = [
     "name": "RP -09 - Playroom",
     "id": "RP -09 - Playroom",
     "location": "RP",
-    "purpose": "",
+    "purpose": "Playroom",
       "ClinicalSpace": "RP"
   },
   {
