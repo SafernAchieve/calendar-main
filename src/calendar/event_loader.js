@@ -7,7 +7,7 @@ import { RRule } from 'rrule';
 // Dynamically determine the base URL
 const BASE_URL = window.location.origin.includes('localhost') 
     ? "http://localhost:4000" // Local development
-    : "https://roomserver.azurewebsites.net"; // Azure production
+    : "https://abhroomserver.azurewebsites.net"; // Azure production
 
 const EVENTS_URL = `${BASE_URL}/events`;
 const BOOKINGS_URL = `${BASE_URL}/bookings`;
@@ -19,6 +19,12 @@ export const getEvents = async (start, end) => {
     const response = await axios.get(`${EVENTS_URL}?start=${startDate.toString("yyyy-MM-ddTHH:mm:ssZ")}&end=${endDate.toString("yyyy-MM-ddTHH:mm:ssZ")}`);
     return response.data;
 };
+
+
+
+
+
+
 
 const generateRecurringEvents = (booking, startDate, endDate) => {
     const events = [];
@@ -135,7 +141,24 @@ const generateRecurringEvents = (booking, startDate, endDate) => {
     return events;
 };
 
-export const getBookings = async (start, end ) => {
+
+
+
+export const getVenues = async () => {
+    try {
+        const response = await axios.get(`${BOOKINGS_URL}`);
+        console.log('getVenues response.data:', response.data);
+        const { venueusers } = response.data;
+        return venueusers;
+    } catch (error) {
+        console.error('Error fetching venues:', error);
+        throw error;
+    }
+};
+getVenues(); 
+
+
+/* export const getBookings = async (start, end ) => {
   const startDate = new DayPilot.Date(start);
   const endDate = new DayPilot.Date(end);
   try {
@@ -185,7 +208,94 @@ export const getBookings = async (start, end ) => {
         console.error("Error fetching data:", error);
         throw error;
     }
+}; */
+
+
+
+
+
+
+export const getBookings = async (start, end) => {
+    const startDate = new DayPilot.Date(start);
+    const endDate = new DayPilot.Date(end);
+    try {
+        const [bookingsResponse, webs, venueUsers] = await Promise.all([
+            axios.get(BOOKINGS_URL, {
+                params: {
+                    start: startDate.toString(),
+                    end: endDate.toString(),
+                },
+            }),
+            getWebs(),
+            getVenues(),
+        ]);
+
+        let rooms = webs.spaces.map((space) => space.name);
+        let room_names = resources_obj.map((resource) => resource.name);
+
+        rooms.sort();
+        room_names.sort();
+
+        const roomNamesDict = {};
+        webs.spaces.forEach((space) => {
+            roomNamesDict[space.id] = space.name;
+        });
+
+        const bookings = bookingsResponse.data.bookings;
+
+        // Filter out bookings that do not have a recurrence rule
+        const recurringBookings = bookings.filter((booking) => booking.recurrenceRule);
+
+        // Process each recurring booking to add recurring events
+        const allBookings = recurringBookings.flatMap((booking) => {
+            const endDatePlusOne = new DayPilot.Date(endDate).addDays(1);
+            return generateRecurringEvents(booking, startDate, endDatePlusOne); // Only return generated events
+        });
+
+        // Assign resources to each booking
+        allBookings.forEach((booking) => {
+            booking.resources = roomNamesDict[booking.spaces[0]];
+        });
+
+        // Create a dictionary to map venue user IDs to their data for quick lookup
+        const venueUserDict = venueUsers.reduce((dict, user) => {
+            dict[user.id] = user;
+            return dict;
+        }, {});
+
+        // Add venue user data to each booking
+        allBookings.forEach((booking) => {
+            const venueUser = venueUserDict[booking.venueuser];
+            if (venueUser) {
+                booking.venueUser = {
+                    id: venueUser.id,
+                    firstName: venueUser.firstName,
+                    lastName: venueUser.lastName,
+                    email: venueUser.username,
+                };
+            }
+        });
+console.log("allvenuBookings", allBookings);
+        // Return the processed bookings
+        return {
+            bookings: allBookings,
+        };
+    } catch (error) {
+        console.error("Error fetching data:", error);
+        throw error;
+    }
 };
+
+
+
+
+
+
+
+
+
+
+
 
 export const getBooking = async () => {
     const response = await axios.get(BOOKINGS_URL)

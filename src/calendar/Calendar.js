@@ -6,8 +6,13 @@ import {
 } from "daypilot-pro-react";
 import { getEvents, getBookings, getWebs } from "./event_loader";
 import resources_obj from "./resources";
-
+import LeightBlueUserNames from "./LightBlueUserNames";
+import Admin from "./Admin";
 import "./Calendar.css";
+import { initializeDatabase, getAllRecords } from "./database"; // Ensure the path is correctrt the function
+import Database from "./database";
+// Inside your component or function
+
 
 const Calendar = () => {
 
@@ -36,6 +41,10 @@ const Calendar = () => {
   const [webs, setWebs] = useState();
   const [selectedWeekday, setSelectedWeekday] = useState("All");
   const [selectedClinicalSpace, setSelectedClinicalSpace] = useState("All");
+  const [adminUser, setAdminUser] = useState([]);
+  const [supervisorUser, setSupervisorUser] = useState([]);
+  const [showDatabase, setShowDatabase] = useState(false); // State to toggle Database component
+
 
   console.log("bookingsData", bookingsData);
   console.log("webs", webs);
@@ -117,7 +126,8 @@ const Calendar = () => {
     eventResizeHandling: "false",
     eventClickHandling: "Disabled",
     eventHoverHandling: "Bubble", // Enables event hover
-  
+    businessBeginsHour: 9,
+    businessEndsHour: 17,
     bubble: new DayPilot.Bubble({
       onLoad: (args) => {
         let recurrenceRuleHtml = "";
@@ -142,150 +152,221 @@ const Calendar = () => {
 
 
 
-
   const loadEvent = async () => {
     try {
-      const bookingsData = await getBookings(startDate, endDate);
-      const bookingBook = bookingsData.bookings;
-  
-      // Sort events by their start date
-      const sortedEvents = bookingBook.sort((a, b) => {
-        const startA = new Date(a.start).getTime(); // Convert to timestamp for comparison
-        const startB = new Date(b.start).getTime();
-        return startA - startB; // Sort in ascending order
-      });
-  
-      // Create a dictionary to store events by resource and time slot
-      const eventDict = {};
-      const recurringEvents = [];
-      sortedEvents.forEach((event) => {
-        if (event.recurrenceRule) {
-          recurringEvents.push(event);
-        }
-      });
-  
-      // Remove non-recurring events that intersect with recurring events
-      const filteredSortedEvents = sortedEvents.filter((event) => {
-        if (event.recurrenceRule) {
-          return true;
-        }
-        for (const recurringEvent of recurringEvents) {
-          const recurringEventStart = new Date(recurringEvent.start).getTime();
-          const recurringEventEnd = new Date(recurringEvent.end).getTime();
-          const eventStart = new Date(event.start).getTime();
-          const eventEnd = new Date(event.end).getTime();
-          if (
-            (eventStart >= recurringEventStart && eventStart < recurringEventEnd) ||
-            (eventEnd > recurringEventStart && eventEnd <= recurringEventEnd) ||
-            (eventStart <= recurringEventStart && eventEnd >= recurringEventEnd)
-          ) {
-            return false;
-          }
-        }
-        return true;
-      });
-  
-      // Filter events by start time and end time for all days within the date range
-      const startTimeParts = startTime.split(":");
-      const endTimeParts = endTime.split(":");
-      const startHour = parseInt(startTimeParts[0]);
-      const startMinute = parseInt(startTimeParts[1]);
-      const endHour = parseInt(endTimeParts[0]);
-      const endMinute = parseInt(endTimeParts[1]);
-  
-      const extendedEndDate = new DayPilot.Date(endDate).addDays(1); // Extend end date by one day
-  
-      const filteredEvents = filteredSortedEvents.filter((event) => {
-        const eventStart = new Date(event.start);
-        const eventEnd = new Date(event.end);
-  
-        // Check if the event occurs within the time range for any day within the date range
-        for (let date = new Date(startDate); date < new Date(extendedEndDate); date.setDate(date.getDate() + 1)) {
-          const filterStart = new Date(date);
-          filterStart.setHours(startHour);
-          filterStart.setMinutes(startMinute);
-  
-          const filterEnd = new Date(date);
-          filterEnd.setHours(endHour);
-          filterEnd.setMinutes(endMinute);
-  
-          const eventStartUTC = new Date(eventStart.getTime() + (eventStart.getTimezoneOffset() * 60 * 1000));
-          const eventEndUTC = new Date(eventEnd.getTime() + (eventEnd.getTimezoneOffset() * 60 * 1000));
-  
-          // Log the filter start and end times for debugging
-          console.log(`Filter Start: ${filterStart.toISOString()}, Filter End: ${filterEnd.toISOString()}`);
-          console.log(`Event Start UTC: ${eventStartUTC.toISOString()}, Event End UTC: ${eventEndUTC.toISOString()}`);
-  
-          // Return true if event start time and end time are within the selected time range
-          if (eventStartUTC >= filterStart && eventEndUTC <= filterEnd) {
-            return true;
-          }
-        }
-        return false;
-      });
-  
-      // Create a dictionary to store events by resource and time slot
-      filteredEvents.forEach((event) => {
-        const key = `${event.resources}-${event.start}-${event.end}`;
-        if (!eventDict[key]) {
-          eventDict[key] = event;
-        } else if (event.recurrenceRule) {
-          // If a recurring event conflicts with a non-recurring event, prioritize the recurring event
-          eventDict[key] = event;
-        }
-      });
-  
-      // Convert the dictionary back to an array of events
-      const finalEvents = Object.values(eventDict);
-  
-      const events = finalEvents.map((booking) => ({
-        start: new DayPilot.Date(booking.start),
-        end: new DayPilot.Date(booking.end),
-        text: booking.title || "Untitled Event", // Use a default title if none is provided
-        id: booking.id,
-        resource: booking.resources, // Assuming the first space ID is the resource
-        recurrenceRule: booking.recurrenceRule || "", // Ensure that recurrenceRule is set
-      }));
-  
-      const mergedEvents = events.reduce((acc, current) => {
-        const existingEvent = acc.find((event) => {
-          return (
-            event.start === current.start &&
-            event.end === current.end &&
-            event.resource === current.resource
-          );
+        const bookingsData = await getBookings(startDate, endDate);
+        const bookingBook = bookingsData.bookings;
+
+        // Sort events by their start date
+        const sortedEvents = bookingBook.sort((a, b) => {
+            const startA = new Date(a.start).getTime(); // Convert to timestamp for comparison
+            const startB = new Date(b.start).getTime();
+            return startA - startB; // Sort in ascending order
         });
+
+        // Create a dictionary to store events by resource and time slot
+        const eventDict = {};
+        const recurringEvents = [];
+        sortedEvents.forEach((event) => {
+            if (event.recurrenceRule) {
+                recurringEvents.push(event);
+            }
+        });
+
+        // Remove non-recurring events that intersect with recurring events
+        const filteredSortedEvents = sortedEvents.filter((event) => {
+            if (event.recurrenceRule) {
+                return true;
+            }
+            for (const recurringEvent of recurringEvents) {
+                const recurringEventStart = new Date(recurringEvent.start).getTime();
+                const recurringEventEnd = new Date(recurringEvent.end).getTime();
+                const eventStart = new Date(event.start).getTime();
+                const eventEnd = new Date(event.end).getTime();
+                if (
+                    (eventStart >= recurringEventStart && eventStart < recurringEventEnd) ||
+                    (eventEnd > recurringEventStart && eventEnd <= recurringEventEnd) ||
+                    (eventStart <= recurringEventStart && eventEnd >= recurringEventEnd)
+                ) {
+                    return false;
+                }
+            }
+            return true;
+        });
+
+        // Filter events by start time and end time for all days within the date range
+        const startTimeParts = startTime.split(":");
+        const endTimeParts = endTime.split(":");
+        const startHour = parseInt(startTimeParts[0]);
+        const startMinute = parseInt(startTimeParts[1]);
+        const endHour = parseInt(endTimeParts[0]);
+        const endMinute = parseInt(endTimeParts[1]);
+
+        const extendedEndDate = new DayPilot.Date(endDate).addDays(1); // Extend end date by one day
+
+        const filteredEvents = filteredSortedEvents.filter((event) => {
+            const eventStart = new Date(event.start);
+            const eventEnd = new Date(event.end);
+
+            // Check if the event occurs within the time range for any day within the date range
+            for (let date = new Date(startDate); date < new Date(extendedEndDate); date.setDate(date.getDate() + 1)) {
+                const filterStart = new Date(date);
+                filterStart.setHours(startHour);
+                filterStart.setMinutes(startMinute);
+
+                const filterEnd = new Date(date);
+                filterEnd.setHours(endHour);
+                filterEnd.setMinutes(endMinute);
+
+                const eventStartUTC = new Date(eventStart.getTime() + (eventStart.getTimezoneOffset() * 60 * 1000));
+                const eventEndUTC = new Date(eventEnd.getTime() + (eventEnd.getTimezoneOffset() * 60 * 1000));
+
+                // Log the filter start and end times for debugging
+               // console.log(`Filter Start: ${filterStart.toISOString()}, Filter End: ${filterEnd.toISOString()}`);
+               // console.log(`Event Start UTC: ${eventStartUTC.toISOString()}, Event End UTC: ${eventEndUTC.toISOString()}`);
+
+                // Return true if event start time and end time are within the selected time range
+                if (eventStartUTC >= filterStart && eventEndUTC <= filterEnd) {
+                    return true;
+                }
+            }
+            return false;
+        });
+
+        // Create a dictionary to store events by resource and time slot
+        filteredEvents.forEach((event) => {
+            const key = `${event.resources}-${event.start}-${event.end}`;
+            if (!eventDict[key]) {
+                eventDict[key] = event;
+            } else if (event.recurrenceRule) {
+                // If a recurring event conflicts with a non-recurring event, prioritize the recurring event
+                eventDict[key] = event;
+            }
+        });
+       // const adminUser = Admin;
+        const Supervision = LeightBlueUserNames;
+     
+        // Convert the dictionary back to an array of events
+        const finalEvents = Object.values(eventDict);
+
+        const events = finalEvents.map((booking) => ({
+          start: new DayPilot.Date(booking.start),
+          end: new DayPilot.Date(booking.end),
+          text: booking.venueUser ? `${booking.venueUser.firstName} ${booking.venueUser.lastName}` : "Untitled Event", // Check if venueUser exists
+          id: booking.id,
+          resource: booking.resources, // Assuming the first space ID is the resource
+          recurrenceRule: booking.recurrenceRule || "", // Ensure that recurrenceRule is set
+          backColor: booking.venueUser && adminUser.includes(booking.venueUser.email) // Step 3: Use adminUser state
+            ? "#FFA07A" // Light orange color for admin users
+            : booking.venueUser && supervisorUser.includes(booking.venueUser.email) 
+              ? "#87CEFA" // Light blue color for supervision events
+              : "", // Default color
+          }
+        )
+        
+      );
+
   
-        if (existingEvent) {
-          // If an existing event is found, merge the titles
-          existingEvent.text += `, ${current.text}`;
-        } else {
-          // If no existing event is found, add the current event to the accumulator
-          acc.push(current);
-        }
-  
-        return acc;
-      }, []);
-  
-      setEvents(mergedEvents);
-      setSelectedEvents(mergedEvents);
+
+
+
+
+
+          
+        const mergedEvents = events.reduce((acc, current) => {
+            const existingEvent = acc.find((event) => {
+                return (
+                    event.start === current.start &&
+                    event.end === current.end &&
+                    event.resource === current.resource
+                );
+            });
+
+            if (existingEvent) {
+                // If an existing event is found, merge the titles
+                existingEvent.text += `, ${current.text}`;
+            } else {
+                // If no existing event is found, add the current event to the accumulator
+                acc.push(current);
+            }
+
+            return acc;
+        }, []);
+
+        setEvents(mergedEvents);
+        setSelectedEvents(mergedEvents);
     } catch (error) {
-      console.error("Error loading events", error);
+        console.error("Error loading events", error);
     }
-  };
+};
   
+
+
+
+
+useEffect(() => {
+  const fetchAdminUsers = async () => {
+   
+    const request = indexedDB.open("testDB", 30);
+    initializeDatabase(request);
+
+    request.onsuccess = async (event) => {
+      const dbInstance = event.target.result;
+      try {
+        const adminUserRecords = await getAllRecords(dbInstance,"users"); // Wait for the records to be retrieved
+        console.log("Fetched admin users:", adminUserRecords);
+        const adminUserEmails = adminUserRecords.map(record => record.admin.trim()); // Extract emails and trim any extra spaces
+        setAdminUser(adminUserEmails);
+
+        const supervisorUserRecords = await getAllRecords(dbInstance, "supervisor");
+        console.log("Fetched supervisor users:", supervisorUserRecords);
+        const supervisorUserEmails = supervisorUserRecords.map(record => record.name.trim());
+        setSupervisorUser(supervisorUserEmails);
+
+        const resources = await getAllRecords(dbInstance, "resources");
+        console.log("Fetched supervisor users:", resources);
+
+      } catch (error) {
+        console.error("Error retrieving admin users:", error);
+      }
+    };
+
+    request.onerror = (event) => {
+      console.error("Error initializing database:", event.target.error);
+    };
+
+
+
+
+
+
+
+
+
+    
+  };
+
+  fetchAdminUsers();
+}, []);
+
+
+
+
+
 
   // Ensure to call loadEvents in the appropriate useEffect hooks
   useEffect(() => {
-    loadEvent();
-  }, [startDate, endDate, startTime, endTime]);
+    if (adminUser.length > 0 && supervisorUser.length > 0) {
+      loadEvent();
+    }
+  }, [startDate, endDate, startTime, endTime, adminUser,supervisorUser]);
 
 
 
 
 
 
-  
+/*   
   const loadEvents = async () => {
     const events = await getEvents(startDate, endDate);
     console.log(
@@ -321,7 +402,7 @@ const Calendar = () => {
     setEvents(e);
     setSelectedEvents(e);
   };
-
+ */
 
 
 
@@ -487,9 +568,25 @@ const Calendar = () => {
       cellHeight: 30 * zoomLevel,
     }));
   }, [zoomLevel]);
+
+  const toggleDatabase = () => {
+    setShowDatabase((prev) => !prev);
+  };
+
+
   return (
     <div className="wrap">
       <div className="calendar">
+
+      <button className="manage-users-btn" onClick={toggleDatabase}>
+        {showDatabase ? "Close Manage Users" : "Manage Users"}
+      </button>
+
+      {/* Database component with slide-in effect */}
+      <div className={`database-container ${showDatabase ? "show" : ""}`}>
+        {showDatabase && <Database />}
+      </div>
+
         <button onClick={() => adjustZoom(0.1)}>Zoom In</button>
         <button onClick={() => adjustZoom(-0.1)}>Zoom Out</button>
         <p>Current Zoom: {zoomLevel.toFixed(1)}x</p>
