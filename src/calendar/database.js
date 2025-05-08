@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, TextField, Typography, MenuItem, Select, FormControl, InputLabel, Paper } from "@mui/material";
+import { Button, TextField, Typography, MenuItem, Select, FormControl, InputLabel, Paper, Box,   Drawer,  } from "@mui/material";
 
 
 
@@ -275,10 +275,14 @@ export const initializeDatabase = (request, setDb) => {
 
 const Database = () => {
 
-
+  const [activeView, setActiveView] = useState("adminSupervisor");
   const [db, setDb] = useState(null);
   const [formData, setformData] = useState({ admin: "", action: "add", store: "users" });  
-
+  const [resourceData, setResourceData] = useState({
+    name: "",
+    location: "",
+    action: "add",
+  });
   useEffect(() => {
     const request = indexedDB.open("testDB", 19);
     initializeDatabase(request, setDb); // Pass setDb to initializeDatabase
@@ -441,71 +445,214 @@ const Database = () => {
   
     setformData({ admin: "", action: "add", store: "users" });
   };
+  const handleSubmitResources = () => {
+    if (!db) {
+      console.error("Database is not initialized");
+      return;
+    }
+
+    const { name, location, action } = resourceData;
+
+    if (!name || !location) {
+      console.error("Both name and location fields are required");
+      return;
+    }
+
+    if (action === "add") {
+      addToDB(db, "resources", { name, location });
+    } else if (action === "delete") {
+      deleteFromDB(db, "resources", { name, location });
+    }
+
+    setResourceData({ name: "", location: "", action: "add" });
+  };
+
+  const handleResourceChange = (e) => {
+    const { name, value } = e.target;
+    setResourceData((prevFormData) => ({
+      ...prevFormData,
+      [name]: value,
+    }));
+  };
+
+  const closeDrawer = () => setActiveView("");
+
+
+
+
 
 
   return (
-    <Paper
-      elevation={3}
-      sx={{
-        maxWidth: 400,
-        margin: "auto",
-        padding: 3,
-        borderRadius: 2,
-        boxShadow: 4,
-      }}
-    >
-      <Typography variant="h5" gutterBottom align="center">
-      Admin/Supervisor Management
-      </Typography>
-
-      {/* Action Selector */}
-      <FormControl fullWidth margin="normal">
-        <InputLabel>Action</InputLabel>
-        <Select
-          value={formData.action}
-          onChange={handleActionChange}
-          label="Action"
-        >
-          <MenuItem value="add">Add</MenuItem>
-          <MenuItem value="delete">Delete</MenuItem>
-        </Select>
-      </FormControl>
-
-      {/* Store Selector */}
-      <FormControl fullWidth margin="normal">
-        <InputLabel>Users</InputLabel>
-        <Select
-          value={formData.store}
-          onChange={handleStoreChange}
-          label="Store"
-        >
-          <MenuItem value="users">Admin</MenuItem>
-          <MenuItem value="supervisor">Supervisors</MenuItem>
-        </Select>
-      </FormControl>
-
-      {/* Admin/Supervisor Input Field */}
-      <TextField
-        fullWidth
-        label="Admin/Supervisor Name"
-        name="admin"
-        value={formData.admin}
-        onChange={handleInputChange}
-        margin="normal"
-        variant="outlined"
-      />
-
-      {/* Submit Button */}
+    <Box sx={{ textAlign: "center", mt: 4 }}>
+      {/* Styled Manage Users Button */}
       <Button
-        variant="contained"
-        color={formData.action === "add" ? "primary" : "error"}
-        fullWidth
-        onClick={handleSubmit}
-        sx={{ mt: 2 }}
+        variant="outlined"
+        color="primary"
+        onClick={() => setActiveView("adminSupervisor")}
+        sx={{
+          textTransform: "none",
+          borderRadius: "8px",
+          padding: "8px 16px",
+          mx: 1,
+          "&:hover": {
+            backgroundColor: "#f5f5f5",
+          },
+        }}
       >
-        {formData.action === "add" ? "Add" : "Delete"}
+        Manage Users
       </Button>
-    </Paper>
+
+      <Button
+        variant="outlined"
+        color="primary"
+        onClick={() => setActiveView("resources")}
+        sx={{
+          textTransform: "none",
+          borderRadius: "8px",
+          padding: "8px 16px",
+          mx: 1,
+          "&:hover": {
+            backgroundColor: "#f5f5f5",
+          },
+        }}
+      >
+        Resource Management
+      </Button>
+
+      {/* Drawer for Admin/Supervisor Management */}
+      <Drawer
+        anchor="right"
+        open={activeView === "adminSupervisor"}
+        onClose={closeDrawer}
+      >
+        <Box sx={{ width: 400, p: 3 }}>
+          <Typography variant="h5" gutterBottom align="center">
+            Admin/Supervisor Management
+          </Typography>
+
+          <FormControl fullWidth margin="normal">
+            <InputLabel>Action</InputLabel>
+            <Select
+              value={formData.action}
+              onChange={(e) =>
+                setformData((prev) => ({ ...prev, action: e.target.value }))
+              }
+              label="Action"
+            >
+              <MenuItem value="add">Add</MenuItem>
+              <MenuItem value="delete">Delete</MenuItem>
+            </Select>
+          </FormControl>
+
+          <FormControl fullWidth margin="normal">
+            <InputLabel>Users</InputLabel>
+            <Select
+              value={formData.store}
+              onChange={(e) =>
+                setformData((prev) => ({ ...prev, store: e.target.value }))
+              }
+              label="Store"
+            >
+              <MenuItem value="users">Admin</MenuItem>
+              <MenuItem value="supervisor">Supervisors</MenuItem>
+            </Select>
+          </FormControl>
+
+          <TextField
+            fullWidth
+            label="Admin/Supervisor Name"
+            name="admin"
+            value={formData.admin}
+            onChange={(e) =>
+              setformData((prev) => ({ ...prev, admin: e.target.value }))
+            }
+            margin="normal"
+            variant="outlined"
+          />
+
+          <Button
+            variant="contained"
+            color={formData.action === "add" ? "primary" : "error"}
+            fullWidth
+            onClick={() => {
+              if (formData.action === "add") {
+                // Add logic
+              } else {
+                // Delete logic
+              }
+              setformData({ admin: "", action: "add", store: "users" });
+            }}
+            sx={{ mt: 2 }}
+          >
+            {formData.action === "add" ? "Add" : "Delete"}
+          </Button>
+        </Box>
+      </Drawer>
+
+      {/* Drawer for Resource Management */}
+      <Drawer
+        anchor="right"
+        open={activeView === "resources"}
+        onClose={closeDrawer}
+      >
+        <Box sx={{ width: 400, p: 3 }}>
+          <Typography variant="h5" gutterBottom align="center">
+            Resource Management
+          </Typography>
+
+          <FormControl fullWidth margin="normal">
+            <InputLabel>Action</InputLabel>
+            <Select
+              value={resourceData.action}
+              onChange={(e) =>
+                setResourceData((prev) => ({ ...prev, action: e.target.value }))
+              }
+              label="Action"
+            >
+              <MenuItem value="add">Add</MenuItem>
+              <MenuItem value="delete">Delete</MenuItem>
+            </Select>
+          </FormControl>
+
+          <TextField
+            fullWidth
+            label="Resource Name"
+            name="name"
+            value={resourceData.name}
+            onChange={(e) =>
+              setResourceData((prev) => ({ ...prev, name: e.target.value }))
+            }
+            margin="normal"
+            variant="outlined"
+          />
+
+          <TextField
+            fullWidth
+            label="Location"
+            name="location"
+            value={resourceData.location}
+            onChange={(e) =>
+              setResourceData((prev) => ({ ...prev, location: e.target.value }))
+            }
+            margin="normal"
+            variant="outlined"
+          />
+
+          <Button
+            variant="contained"
+            color={resourceData.action === "add" ? "primary" : "error"}
+            fullWidth
+            onClick={() => {
+              // Add or delete resource logic
+              setResourceData({ name: "", location: "", action: "add" });
+            }}
+            sx={{ mt: 2 }}
+          >
+            {resourceData.action === "add" ? "Add Resource" : "Delete Resource"}
+          </Button>
+        </Box>
+      </Drawer>
+    </Box>
   );
 };
 

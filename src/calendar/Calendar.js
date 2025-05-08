@@ -4,6 +4,19 @@ import {
   DayPilotCalendar,
   DayPilotNavigator,
 } from "daypilot-pro-react";
+
+import {
+  Button,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
+  TextField,
+  Box,
+  Typography,
+  IconButton,
+} from "@mui/material";
+
 import { getEvents, getBookings, getWebs } from "./event_loader";
 import resources_obj from "./resources";
 import LeightBlueUserNames from "./LightBlueUserNames";
@@ -575,135 +588,135 @@ useEffect(() => {
 
 
   return (
-    <div className="wrap">
-      <div className="calendar">
-
-      <button className="manage-users-btn" onClick={toggleDatabase}>
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 2, p: 2 }}>
+      <Button
+        variant="contained"
+        color={showDatabase ? "secondary" : "primary"}
+        onClick={toggleDatabase}
+      >
         {showDatabase ? "Close Manage Users" : "Manage Users"}
-      </button>
+      </Button>
 
-      {/* Database component with slide-in effect */}
-      <div className={`database-container ${showDatabase ? "show" : ""}`}>
-        {showDatabase && <Database />}
-      </div>
+      {showDatabase && (
+        <Box
+          sx={{
+            transform: showDatabase ? "translateX(0)" : "translateX(-100%)",
+            opacity: showDatabase ? 1 : 0,
+            transition: "transform 0.5s ease-in-out, opacity 0.5s ease-in-out",
+          }}
+        >
+          <Database />
+        </Box>
+      )}
 
-        <button onClick={() => adjustZoom(0.1)}>Zoom In</button>
-        <button onClick={() => adjustZoom(-0.1)}>Zoom Out</button>
-        <p>Current Zoom: {zoomLevel.toFixed(1)}x</p>
+      <Box sx={{ display: "flex", gap: 1 }}>
+        <Button variant="outlined" onClick={() => adjustZoom(0.1)}>
+          Zoom In
+        </Button>
+        <Button variant="outlined" onClick={() => adjustZoom(-0.1)}>
+          Zoom Out
+        </Button>
+        <Typography>Current Zoom: {zoomLevel.toFixed(1)}x</Typography>
+      </Box>
 
-        <div className="toolbar">
-          <div>
-            <label>
-              Start Date:{" "}
-              <input
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-              />
-            </label>
-          </div>
-          <div>
-            <label>
-              End Date:{" "}
-              <input
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-              />
-            </label>
-          </div>
-          <label>
-            Room Type:
-            <select onChange={handlePurposeChange} value={selectedPurpose}>
-              <option value="All">All</option>
-              <option value="Playroom">Playroom</option>
-              <option value="Couple">Couple</option>
-              <option value="Individual">Individual</option>
-              <option value="Conference Room">Conference Room</option>
-            </select>
-          </label>
-          <label>
-            Location:
-            <select onChange={handleLocationChange} value={selectedLocation}>
-              <option value="All">All</option>
-              <option value="RP">RP</option>
-              <option value="CC">CC</option>
-              <option value="Airmont">Airmont</option>
-              <option value="SRR">SRR</option>
-              <option value="WC">WC</option>
-              <option value="2 MPD">2 MPD</option>
-              <option value="M">M</option>
-            </select>
-          </label>
-          <label>
-            Name:
-            <select onChange={handleNameChange} value={selectedName}>
-              <option value="All">All</option>
-              {resources_obj.map((resource) => (
-                <option key={resource.name} value={resource.name}>
-                  {resource.name}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            Weekday:
-            <select
-              onChange={(e) => setSelectedWeekday(e.target.value)}
-              value={selectedWeekday}
-            >
-              <option value="All">All</option>
-              <option value="Sunday">Sunday</option>
-              <option value="Monday">Monday</option>
-              <option value="Tuesday">Tuesday</option>
-              <option value="Wednesday">Wednesday</option>
-              <option value="Thursday">Thursday</option>
-              <option value="Friday">Friday</option>
-              <option value="Saturday">Saturday</option>
-            </select>
-          </label>
-          <label>
-            Clinical Space:
-            <select
-              onChange={handleClinicalSpaceChange}
-              value={selectedClinicalSpace}
-            >
-              <option value="All">All</option>
-              <option value="RP">RP</option>
-              <option value="Airmont">Airmont</option>
-              <option value="CC">CC</option>
-              <option value="M">M</option>
-              <option value="950-03">950-03</option>
-              <option value="950-04">950-04</option>
-              <option value="950-05">950-05</option>
-              <option value="950-07">950-07</option>
-            </select>
-          </label>
+      <Box
+        sx={{
+          display: "flex",
+          flexWrap: "wrap",
+          alignItems: "center",
+          gap: 2,
+          py: 2,
+          px: 3,
+          borderRadius: 2,
+          backgroundColor: "#F9F9F9",
+          boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.1)",
+          border: "1px solid #E0E0E0",
+        }}
+      >
+        <TextField
+          type="date"
+          label="Start Date"
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
+          sx={{ flex: 1 }}
+        />
+        <TextField
+          type="date"
+          label="End Date"
+          value={endDate}
+          onChange={(e) => setEndDate(e.target.value)}
+          sx={{ flex: 1 }}
+        />
+        <FormControl sx={{ flex: 1 }}>
+          <InputLabel>Room Type</InputLabel>
+          <Select value={selectedPurpose} onChange={handlePurposeChange}>
+            <MenuItem value="All">All</MenuItem>
+            <MenuItem value="Playroom">Playroom</MenuItem>
+            <MenuItem value="Couple">Couple</MenuItem>
+            <MenuItem value="Individual">Individual</MenuItem>
+            <MenuItem value="Conference Room">Conference Room</MenuItem>
+          </Select>
+        </FormControl>
+        <FormControl sx={{ flex: 1 }}>
+          <InputLabel>Location</InputLabel>
+          <Select value={selectedLocation} onChange={handleLocationChange}>
+            <MenuItem value="All">All</MenuItem>
+            <MenuItem value="RP">RP</MenuItem>
+            <MenuItem value="CC">CC</MenuItem>
+            <MenuItem value="Airmont">Airmont</MenuItem>
+            <MenuItem value="SRR">SRR</MenuItem>
+            <MenuItem value="WC">WC</MenuItem>
+            <MenuItem value="2 MPD">2 MPD</MenuItem>
+            <MenuItem value="M">M</MenuItem>
+          </Select>
+        </FormControl>
+        <FormControl sx={{ flex: 1 }}>
+          <InputLabel>Name</InputLabel>
+          <Select value={selectedName} onChange={handleNameChange}>
+            <MenuItem value="All">All</MenuItem>
+            {resources_obj.map((resource) => (
+              <MenuItem key={resource.name} value={resource.name}>
+                {resource.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <FormControl sx={{ flex: 1 }}>
+          <InputLabel>Clinical Space</InputLabel>
+          <Select
+            value={selectedClinicalSpace}
+            onChange={handleClinicalSpaceChange}
+          >
+            <MenuItem value="All">All</MenuItem>
+            <MenuItem value="RP">RP</MenuItem>
+            <MenuItem value="Airmont">Airmont</MenuItem>
+            <MenuItem value="CC">CC</MenuItem>
+            <MenuItem value="M">M</MenuItem>
+            <MenuItem value="950-03">950-03</MenuItem>
+            <MenuItem value="950-04">950-04</MenuItem>
+            <MenuItem value="950-05">950-05</MenuItem>
+            <MenuItem value="950-07">950-07</MenuItem>
+          </Select>
+        </FormControl>
+        <TextField
+          type="time"
+          label="Start Time"
+          value={startTime}
+          onChange={(e) => setStartTime(e.target.value)}
+        />
+        <TextField
+          type="time"
+          label="End Time"
+          value={endTime}
+          onChange={(e) => setEndTime(e.target.value)}
+        />
+        <Button variant="contained" onClick={applyResourceFilter}>
+          Search
+        </Button>
+      </Box>
 
-          <label>
-            Start Time:{" "}
-            <input
-              type="time"
-              value={startTime}
-              onChange={(e) => setStartTime(e.target.value)}
-            />
-          </label>
-          <label>
-            End Time:{" "}
-            <input
-              type="time"
-              value={endTime}
-              onChange={(e) => setEndTime(e.target.value)}
-            />
-          </label>
-          <input
-            name="view"
-            type="button"
-            onClick={applyResourceFilter}
-            value="Search"
-          />
-        </div>
-        <DayPilotCalendar
+      <Box>
+      <DayPilotCalendar
           {...config}
           ref={calendarRef}
           events={selectedEvents}
@@ -715,8 +728,8 @@ useEffect(() => {
           resourceField="resource"
           startTime={startTime}
         />
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 };
 
