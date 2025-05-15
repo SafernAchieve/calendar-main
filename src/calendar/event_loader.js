@@ -2,7 +2,7 @@
 import axios from "axios";
 import { DayPilot, DayPilotCalendar } from "daypilot-pro-react";
 import resources_obj from "./resources";
-import { RRule } from 'rrule';
+
 
 // Dynamically determine the base URL
 const BASE_URL = window.location.origin.includes('localhost') 

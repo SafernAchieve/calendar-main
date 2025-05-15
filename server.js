@@ -2,7 +2,7 @@ const http = require("http");
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const WebSocket = require("ws");
+
 const ICAL = require("ical");
 const axios = require("axios");
 const { datetime, rrulestr } = require("rrule");
