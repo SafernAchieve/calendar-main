@@ -24,7 +24,7 @@ import Admin from "./Admin";
 import "./Calendar.css";
 import { initializeDatabase, getAllRecords } from "./database"; // Ensure the path is correctrt the function
 import Database from "./database";
-// Inside your component or function
+
 
 
 const Calendar = () => {
