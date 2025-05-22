@@ -4,6 +4,7 @@ import {
   DayPilotCalendar,
   DayPilotNavigator,
 } from "daypilot-pro-react";
+import UserManagement from "./UserManagement";
 
 import {
   Button,
@@ -17,14 +18,15 @@ import {
   IconButton,
 } from "@mui/material";
 
+import ResourceManagement from "./ResourceManagement"; 
 import { getEvents, getBookings, getWebs } from "./event_loader";
-import resources_obj from "./resources";
+//import resources_obj from "./resources";
 import LeightBlueUserNames from "./LightBlueUserNames";
 import Admin from "./Admin";
 import "./Calendar.css";
 import { initializeDatabase, getAllRecords } from "./database"; // Ensure the path is correctrt the function
 import Database from "./database";
-
+// Inside your component or function
 
 
 const Calendar = () => {
@@ -51,13 +53,15 @@ const Calendar = () => {
   const [startTime, setStartTime] = useState("00:00");
   const [endTime, setEndTime] = useState("23:59");
   const [bookingsData, setBookingsData] = useState();
+  const [showUserManagement, setShowUserManagement] = useState(false); // State to toggle User Management
   const [webs, setWebs] = useState();
   const [selectedWeekday, setSelectedWeekday] = useState("All");
   const [selectedClinicalSpace, setSelectedClinicalSpace] = useState("All");
   const [adminUser, setAdminUser] = useState([]);
   const [supervisorUser, setSupervisorUser] = useState([]);
   const [showDatabase, setShowDatabase] = useState(false); // State to toggle Database component
-
+const [showResourceManagement, setShowResourceManagement] = useState(false);
+  const [resources_obj, setResourcesObj] = useState([]);
 
   console.log("bookingsData", bookingsData);
   console.log("webs", webs);
@@ -269,24 +273,15 @@ const Calendar = () => {
           id: booking.id,
           resource: booking.resources, // Assuming the first space ID is the resource
           recurrenceRule: booking.recurrenceRule || "", // Ensure that recurrenceRule is set
-          backColor: booking.venueUser && adminUser.includes(booking.venueUser.email) // Step 3: Use adminUser state
+          backColor: booking.venueUser && adminUser.some((email) => email.toLowerCase() === booking.venueUser.email.toLowerCase())
             ? "#FFA07A" // Light orange color for admin users
-            : booking.venueUser && supervisorUser.includes(booking.venueUser.email) 
+            : booking.venueUser && supervisorUser.some((email) => email.toLowerCase() === booking.venueUser.email.toLowerCase())
               ? "#87CEFA" // Light blue color for supervision events
               : "", // Default color
-          }
-        )
+        }
+    )); 
         
-      );
-
-  
-
-
-
-
-
-          
-        const mergedEvents = events.reduce((acc, current) => {
+      const mergedEvents = events.reduce((acc, current) => {
             const existingEvent = acc.find((event) => {
                 return (
                     event.start === current.start &&
@@ -314,51 +309,27 @@ const Calendar = () => {
 };
   
 
+const fetchAdminUsers = async () => {
+  try {
+    // Fetch admin users from the backend
+    const adminResponse = await fetch("http://localhost:4000/admins");
+    const adminData = await adminResponse.json();
+    setAdminUser(adminData);
 
+    // Fetch supervisor users from the backend
+    const supervisorResponse = await fetch("http://localhost:4000/supervisors");
+    const supervisorData = await supervisorResponse.json();
+    setSupervisorUser(supervisorData);
+
+    console.log("Fetched admin users:", adminData);
+    console.log("Fetched supervisor users:", supervisorData);
+  } catch (error) {
+    console.error("Error fetching admin or supervisor users:", error);
+  }
+};
 
 
 useEffect(() => {
-  const fetchAdminUsers = async () => {
-   
-    const request = indexedDB.open("testDB", 30);
-    initializeDatabase(request);
-
-    request.onsuccess = async (event) => {
-      const dbInstance = event.target.result;
-      try {
-        const adminUserRecords = await getAllRecords(dbInstance,"users"); // Wait for the records to be retrieved
-        console.log("Fetched admin users:", adminUserRecords);
-        const adminUserEmails = adminUserRecords.map(record => record.admin.trim()); // Extract emails and trim any extra spaces
-        setAdminUser(adminUserEmails);
-
-        const supervisorUserRecords = await getAllRecords(dbInstance, "supervisor");
-        console.log("Fetched supervisor users:", supervisorUserRecords);
-        const supervisorUserEmails = supervisorUserRecords.map(record => record.name.trim());
-        setSupervisorUser(supervisorUserEmails);
-
-        const resources = await getAllRecords(dbInstance, "resources");
-        console.log("Fetched supervisor users:", resources);
-
-      } catch (error) {
-        console.error("Error retrieving admin users:", error);
-      }
-    };
-
-    request.onerror = (event) => {
-      console.error("Error initializing database:", event.target.error);
-    };
-
-
-
-
-
-
-
-
-
-    
-  };
-
   fetchAdminUsers();
 }, []);
 
@@ -417,7 +388,33 @@ useEffect(() => {
   };
  */
 
+const fetchResources = async () => {
 
+  try {
+    const response = await fetch("http://localhost:4000/resources"); // <-- updated endpoint
+    const data = await response.json();
+    console.log("Fetched resources:", data);
+    setResourcesObj(data);
+    console.log("Resources:", resources_obj);
+  } catch (error) {
+    console.error("Error fetching resources:", error);
+  }
+
+};
+
+
+
+// Fetch resources on mount
+
+useEffect(() => {
+  fetchResources();
+}, []);
+
+
+
+useEffect(() => {
+  daysResources();
+}, [resources_obj]);
 
 
   
@@ -489,14 +486,14 @@ useEffect(() => {
     const columns = [];
     // Use below code for UTC
 
-    const startFormatted = convertDateFormat(startDate);
-    const endFormatted = convertDateFormat(endDate);
-    const start = new Date(startFormatted);
-    const end = new Date(endFormatted);
+     const startFormatted = convertDateFormat(startDate);
+     const endFormatted = convertDateFormat(endDate);
+     const start = new Date(startFormatted);
+     const end = new Date(endFormatted);
 
     // Use below code for GMT
-    // const start = new Date(startDate);
-    //const end = new Date(endDate);
+   // const start = new Date(startDate);
+   // const end = new Date(endDate);
 
     end.setHours(23, 59, 59);
     const daysDifference =
@@ -586,28 +583,49 @@ useEffect(() => {
     setShowDatabase((prev) => !prev);
   };
 
+  const toggleUserManagement = () => {
+    setShowUserManagement((prev) => !prev);
+  };
+
+  const toggleResourceManagement = () => {
+    setShowResourceManagement((prev) => !prev);
+  }
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2, p: 2 }}>
-      <Button
-        variant="contained"
-        color={showDatabase ? "secondary" : "primary"}
-        onClick={toggleDatabase}
-      >
-        {showDatabase ? "Close Manage Users" : "Manage Users"}
-      </Button>
-
-      {showDatabase && (
-        <Box
-          sx={{
-            transform: showDatabase ? "translateX(0)" : "translateX(-100%)",
-            opacity: showDatabase ? 1 : 0,
-            transition: "transform 0.5s ease-in-out, opacity 0.5s ease-in-out",
-          }}
+      <Box sx={{ display: "flex", gap: 2 }}>
+        <Button
+          variant="contained"
+          color={showUserManagement ? "secondary" : "primary"}
+          onClick={toggleUserManagement}
         >
-          <Database />
-        </Box>
+          {showUserManagement ? "Close User Management" : "Manage Users"}
+        </Button>
+        <Button
+          variant="contained"
+          color={showResourceManagement ? "secondary" : "primary"}
+          onClick={toggleResourceManagement}
+        >
+          {showResourceManagement ? "Close Resource Management" : "Manage Resources"}
+        </Button>
+      </Box>
+
+
+      {showUserManagement && (
+        <UserManagement
+          adminUser={adminUser}
+          supervisorUser={supervisorUser}
+          setAdminUser={setAdminUser}
+          setSupervisorUser={setSupervisorUser}
+          open={showUserManagement}
+          onClose={toggleUserManagement}
+        />
       )}
+
+      <ResourceManagement
+        open={showResourceManagement}
+        onClose={toggleResourceManagement}
+      />
 
       <Box sx={{ display: "flex", gap: 1 }}>
         <Button variant="outlined" onClick={() => adjustZoom(0.1)}>
